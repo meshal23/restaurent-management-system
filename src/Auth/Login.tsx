@@ -30,6 +30,11 @@ export async function clientAction({ request }: ActionFunctionArgs) {
     console.log(err);
     toast.error("check your username or password");
     return redirect("/login");
+  } finally {
+    setTimeout(() => {
+      localStorage.removeItem("pocketbase_token");
+      toast.error("session timeout login again");
+    }, 24 * 60 * 60 * 1000);
   }
 }
 
