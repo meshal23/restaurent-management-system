@@ -12,6 +12,7 @@ import Products from "./pocketbase/Products";
 import Login, { clientAction as LoginAction } from "./Auth/Login";
 import Register, { clientAction as RegisterAction } from "./Auth/Register";
 import MainLayout from "./Layout/MainLayout";
+import ValidateForm from "./ReactQuery/ValidateForm";
 
 function App() {
   const router = createBrowserRouter(
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<Welcome data={"Hello"} test={true} />} />
           <Route path="/generics" element={<SummaryExample />} />
           <Route path="/pocketbase-crud" element={<Products />} />
+          <Route path="/tanstack-form" element={<ValidateForm />} />
         </Route>
       </>
     )
