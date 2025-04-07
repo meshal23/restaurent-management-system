@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
+import { Trash2 } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 
 interface formProps {
   username: string;
@@ -11,6 +14,7 @@ interface formProps {
   isMarried: boolean;
   nationality: string;
   interests: any;
+  skills: any;
 }
 
 const ValidateForm = () => {
@@ -23,7 +27,8 @@ const ValidateForm = () => {
       age: 0,
       isMarried: false,
       nationality: "",
-      interests: [" ", " "] as string[],
+      interests: [] as string[],
+      skills: [] as { language: string; rating: number }[],
     } as formProps,
 
     onSubmit: ({ value }) => {
@@ -226,7 +231,7 @@ const ValidateForm = () => {
           )}
         </form.Field>
 
-        {/* interests (dynamic arrays) */}
+        {/* interests (dynamic arrays) with string */}
         <form.Field
           name="interests"
           // validators={{
@@ -239,29 +244,134 @@ const ValidateForm = () => {
             <>
               {field?.state?.value?.map((_: any, index: any) => {
                 return (
-                  <form.Field name={`interests[${index}]`}>
-                    {(subField: any) => (
-                      <div>
-                        <label
-                          htmlFor="small-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                          Small input
-                        </label>
-                        <input
-                          type="text"
-                          id="small-input"
-                          value={subField?.state?.value}
-                          onChange={(e) =>
-                            subField.handleChange(e.target.value)
-                          }
-                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                      </div>
-                    )}
-                  </form.Field>
+                  <div className="flex w-full gap-3">
+                    <form.Field name={`interests[${index}]`}>
+                      {(subField: any) => (
+                        <div className="w-11/12">
+                          <label
+                            htmlFor="small-input"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Small input
+                          </label>
+                          <input
+                            type="text"
+                            id="small-input"
+                            value={subField?.state?.value}
+                            onChange={(e) =>
+                              subField.handleChange(e.target.value)
+                            }
+                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    <Button
+                      type="button"
+                      variant={"destructive"}
+                      className=" w-1/12 mt-6 cursor-pointer"
+                      onClick={() => field.removeValue(index)}
+                    >
+                      <Trash2 size={50} className="font-bold" />
+                    </Button>
+                  </div>
                 );
               })}
+              <div className="flex gap-5">
+                <Button
+                  type="button"
+                  className="mt-3 cursor-pointer"
+                  onClick={() => field.pushValue("")}
+                >
+                  Add Interest <CirclePlus />
+                </Button>
+              </div>
+            </>
+          )}
+        </form.Field>
+
+        {/* skills (dynamic arrays) with obj */}
+        <form.Field
+          name="skills"
+          // validators={{
+          //   onChange: ({ value }: any) => {
+          //     return value === [] ? "Username is required" : undefined;
+          //   },
+          // }}
+        >
+          {(field: any) => (
+            <>
+              {field?.state?.value?.map((_: any, index: any) => {
+                return (
+                  <div className="min-w-full mt-4 flex gap-3">
+                    {/* language */}
+                    <form.Field name={`skills[${index}].language`}>
+                      {(subField: any) => (
+                        <div className="w-2/5">
+                          <label
+                            htmlFor="small-input"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            skill
+                          </label>
+                          <input
+                            type="text"
+                            id="small-input"
+                            value={subField?.state?.value}
+                            onChange={(e) =>
+                              subField.handleChange(e.target.value)
+                            }
+                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    {/* rating */}
+                    <form.Field name={`skills[${index}].rating`}>
+                      {(subField: any) => (
+                        <div className="w-2/5">
+                          <label
+                            htmlFor="small-input"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Rating
+                          </label>
+                          <input
+                            type="text"
+                            id="small-input"
+                            value={subField?.state?.value}
+                            onChange={(e) =>
+                              subField.handleChange(e.target.value)
+                            }
+                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    {/* remove button */}
+                    <Button
+                      type="button"
+                      variant={"destructive"}
+                      className=" w-1/5 mt-6 cursor-pointer"
+                      onClick={() => field.removeValue(index)}
+                    >
+                      <Trash2 size={50} className="font-bold" />
+                    </Button>
+                  </div>
+                );
+              })}
+              <div className="flex gap-5">
+                <Button
+                  type="button"
+                  className="mt-3 cursor-pointer"
+                  onClick={() => field.pushValue({ language: "", rating: 0 })}
+                >
+                  Add Skills <CirclePlus />
+                </Button>
+              </div>
             </>
           )}
         </form.Field>
