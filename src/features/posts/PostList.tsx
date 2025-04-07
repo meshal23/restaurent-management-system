@@ -4,9 +4,17 @@ import CreatePostForm from "./CreatePostForm";
 import { selectAllPosts } from "./PostSlice";
 import PostAuthour from "./PostAuthour";
 import TimeAgo from "./TimeAgo";
+import ReactionButtons from "./ReactionButtons";
 
 const PostList = () => {
   const posts = useSelector(selectAllPosts);
+
+  const orderedPost = posts
+    ?.slice()
+    .sort((a: any, b: any) => b.date.localeCompare(a.date));
+  // here we use slice() to create copy of post array
+  // && localeCompare is to compare 2 dates
+
   return (
     <section className="w-full flex flex-col justify-center items-center">
       <div className="w-full mt-3">
@@ -15,7 +23,8 @@ const PostList = () => {
 
       {/* post list */}
       <div className="w-full mt-5 flex flex-col justify-center items-center gap-3">
-        {posts.map((post: any) => {
+        {/* orderedpost used here because new post should be on top of the list */}
+        {orderedPost.map((post: any) => {
           return (
             <div
               key={post.id}
@@ -30,6 +39,7 @@ const PostList = () => {
               <p className="flex gap-4">
                 <PostAuthour userId={post.userId} />
                 <TimeAgo timestamp={post.date} />
+                <ReactionButtons post={post} />
               </p>
             </div>
           );
