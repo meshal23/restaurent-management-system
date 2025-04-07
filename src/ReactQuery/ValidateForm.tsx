@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from "@tanstack/react-form";
 
 interface formProps {
@@ -9,6 +10,7 @@ interface formProps {
   birth_date: string;
   isMarried: boolean;
   nationality: string;
+  interests: any;
 }
 
 const ValidateForm = () => {
@@ -21,6 +23,7 @@ const ValidateForm = () => {
       age: 0,
       isMarried: false,
       nationality: "",
+      interests: [" ", " "] as string[],
     } as formProps,
 
     onSubmit: ({ value }) => {
@@ -35,6 +38,7 @@ const ValidateForm = () => {
         className="max-w-lg mx-auto mt-4"
         onSubmit={(e) => {
           e.preventDefault();
+          e.stopPropagation(); // added to implement dynamic array
           form.handleSubmit();
         }}
       >
@@ -42,12 +46,12 @@ const ValidateForm = () => {
         <form.Field
           name="username"
           validators={{
-            onChange: ({ value }) => {
+            onChange: ({ value }: any) => {
               return value.trim() === "" ? "Username is required" : undefined;
             },
           }}
         >
-          {(field) => (
+          {(field: any) => (
             <div className="mb-5">
               <label
                 htmlFor="username"
@@ -222,6 +226,46 @@ const ValidateForm = () => {
           )}
         </form.Field>
 
+        {/* interests (dynamic arrays) */}
+        <form.Field
+          name="interests"
+          // validators={{
+          //   onChange: ({ value }: any) => {
+          //     return value === [] ? "Username is required" : undefined;
+          //   },
+          // }}
+        >
+          {(field: any) => (
+            <>
+              {field?.state?.value?.map((_: any, index: any) => {
+                return (
+                  <form.Field name={`interests[${index}]`}>
+                    {(subField: any) => (
+                      <div>
+                        <label
+                          htmlFor="small-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Small input
+                        </label>
+                        <input
+                          type="text"
+                          id="small-input"
+                          value={subField?.state?.value}
+                          onChange={(e) =>
+                            subField.handleChange(e.target.value)
+                          }
+                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                      </div>
+                    )}
+                  </form.Field>
+                );
+              })}
+            </>
+          )}
+        </form.Field>
+
         {/* checkbox */}
         <form.Field
           name="isMarried"
@@ -232,7 +276,7 @@ const ValidateForm = () => {
           }}
         >
           {(field) => (
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 mt-3">
               <input
                 id="default-checkbox"
                 type="checkbox"
