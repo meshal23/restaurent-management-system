@@ -13,6 +13,7 @@ import Login, { clientAction as LoginAction } from "./Auth/Login";
 import Register, { clientAction as RegisterAction } from "./Auth/Register";
 import MainLayout from "./Layout/MainLayout";
 import ValidateForm from "./ReactQuery/ValidateForm";
+import PostList from "./features/posts/PostList";
 
 function App() {
   const router = createBrowserRouter(
@@ -29,6 +30,9 @@ function App() {
           <Route path="/generics" element={<SummaryExample />} />
           <Route path="/pocketbase-crud" element={<Products />} />
           <Route path="/tanstack-form" element={<ValidateForm />} />
+
+          {/* redux practice */}
+          <Route path="/redux-practice" element={<PostList />} />
         </Route>
       </>
     )
