@@ -10,6 +10,7 @@ const Welcome = <T, K>({ data, test }: WelcomeProps<T, K>) => {
     console.log(typeof data);
     console.log(typeof test);
   }, []);
+
   return <div>Welcome</div>;
 };
 
