@@ -8,18 +8,26 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  TableFooter,
   // TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "../components/ui/table";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const API_URL = import.meta.env.VITE_POCKETBASE_URL;
+
+let pageNumber = 1;
 
 const Products = () => {
   const queryClient = useQueryClient();
@@ -29,41 +37,43 @@ const Products = () => {
     handleSubmit,
     watch,
     formState: { errors },
+    reset,
   } = useForm();
 
   const onSubmit = (data: any) => {
     console.log(data);
     // handleSubmit(data);
     createProductMutation.mutate(data);
+    reset();
   };
-  console.log(watch());
+  //console.log(watch());
 
   //fetch the product data
-  const {
-    data: productData,
-    isLoading,
-    isSuccess,
-  } = useQuery<any>({
-    queryKey: ["products"],
-    queryFn: async () => {
-      console.log(API_URL);
-      return axios({
-        method: "get",
-        url: `${API_URL}products/records`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("pocketbase_token")}`,
-        },
-      });
-    },
-  });
+  // const {
+  //   data: productData,
+  //   isLoading,
+  //   isSuccess,
+  // } = useQuery<any>({
+  //   queryKey: ["products"],
+  //   queryFn: async () => {
+  //     // console.log(API_URL);
+  //     return axios({
+  //       method: "get",
+  //       url: `${API_URL}products/records`,
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("pocketbase_token")}`,
+  //       },
+  //     });
+  //   },
+  // });
 
-  if (isLoading) {
-    console.log("loading");
-  }
+  // if (isLoading) {
+  //   console.log("loading");
+  // }
 
-  if (isSuccess) {
-    console.log(productData);
-  }
+  // if (isSuccess) {
+  //   console.log(productData);
+  // }
 
   // (newProduct: any) => {
   //   return axios.post(`${API_URL}products/records`, newProduct);
@@ -75,6 +85,44 @@ const Products = () => {
   //     queryClient.invalidateQueries("products");
   //   },
   // }
+
+  //useInfiniteQuery
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["products"],
+    queryFn: async ({ pageParam = 1 }) => {
+      // console.log(API_URL);
+      const response = await axios({
+        method: "get",
+        url: `${API_URL}products/records?perPage=2&page=${pageParam}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("pocketbase_token")}`,
+        },
+      });
+
+      return {
+        response,
+        nextPage: pageParam + 1,
+        // isLast: response.data.items.length < 2
+      };
+    },
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
+  let productData;
+  if (isSuccess) {
+    console.log(data);
+    productData = data?.pages[0]?.response?.data.items;
+    console.log(productData);
+  }
 
   // create a mutation on product
   const createProductMutation = useMutation({
@@ -196,7 +244,7 @@ const Products = () => {
             {isLoading ? (
               <Skeleton />
             ) : (
-              productData?.data?.items?.map((product: any) => (
+              productData?.map((product: any) => (
                 <TableRow key={product.id}>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell className="text-right">
@@ -212,12 +260,18 @@ const Products = () => {
               ))
             )}
           </TableBody>
-          {/* <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
-            </TableRow>
-          </TableFooter> */}
+          {hasNextPage && (
+            <TableFooter>
+              <Button
+                onClick={() => {
+                  fetchNextPage();
+                }}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? "loading more..." : "load more products"}
+              </Button>
+            </TableFooter>
+          )}
         </Table>
       </div>
     </section>
