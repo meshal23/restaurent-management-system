@@ -12,7 +12,7 @@ import Products from "./pocketbase/Products";
 import Login, { clientAction as LoginAction } from "./Auth/Login";
 import Register, { clientAction as RegisterAction } from "./Auth/Register";
 import MainLayout from "./Layout/MainLayout";
-import ValidateForm from "./ReactQuery/ValidateForm";
+import ValidateForm from "./TanstackForm/ValidateForm";
 
 function App() {
   const router = createBrowserRouter(
