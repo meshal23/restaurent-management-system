@@ -12,7 +12,10 @@ import Products from "./pocketbase/Products";
 import Login, { clientAction as LoginAction } from "./Auth/Login";
 import Register, { clientAction as RegisterAction } from "./Auth/Register";
 import MainLayout from "./Layout/MainLayout";
-import ValidateForm from "./ReactQuery/ValidateForm";
+import ValidateForm from "./TanstackForm/ValidateForm";
+import BasicExample from "./ReactSelect/BasicExample";
+import AsynchronousSelect from "./ReactSelect/AsynchronousSelect";
+import StylingDropdown from "./ReactSelect/StylingDropdown";
 
 function App() {
   const router = createBrowserRouter(
@@ -28,7 +31,14 @@ function App() {
           <Route path="/" element={<Welcome data={"Hello"} test={true} />} />
           <Route path="/generics" element={<SummaryExample />} />
           <Route path="/pocketbase-crud" element={<Products />} />
+
+          {/* tanstack form  */}
           <Route path="/tanstack-form" element={<ValidateForm />} />
+
+          {/* react select */}
+          <Route path="/react-select" element={<BasicExample />} />
+          <Route path="/react-select-async" element={<AsynchronousSelect />} />
+          <Route path="/react-select-styling" element={<StylingDropdown />} />
         </Route>
       </>
     )
