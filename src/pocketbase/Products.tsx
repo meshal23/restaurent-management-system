@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCaption,
+  // TableCaption,
   TableCell,
-  TableFooter,
+  // TableFooter,
   // TableFooter,
   TableHead,
   TableHeader,
@@ -16,7 +16,6 @@ import {
 } from "../components/ui/table";
 
 import {
-  useQuery,
   useMutation,
   useQueryClient,
   useInfiniteQuery,
@@ -27,72 +26,30 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const API_URL = import.meta.env.VITE_POCKETBASE_URL;
 
-let pageNumber = 1;
-
 const Products = () => {
   const queryClient = useQueryClient();
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
     reset,
   } = useForm();
 
   const onSubmit = (data: any) => {
-    console.log(data);
+    // console.log(data);
     // handleSubmit(data);
     createProductMutation.mutate(data);
     reset();
   };
-  //console.log(watch());
-
-  //fetch the product data
-  // const {
-  //   data: productData,
-  //   isLoading,
-  //   isSuccess,
-  // } = useQuery<any>({
-  //   queryKey: ["products"],
-  //   queryFn: async () => {
-  //     // console.log(API_URL);
-  //     return axios({
-  //       method: "get",
-  //       url: `${API_URL}products/records`,
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("pocketbase_token")}`,
-  //       },
-  //     });
-  //   },
-  // });
-
-  // if (isLoading) {
-  //   console.log("loading");
-  // }
-
-  // if (isSuccess) {
-  //   console.log(productData);
-  // }
-
-  // (newProduct: any) => {
-  //   return axios.post(`${API_URL}products/records`, newProduct);
-  // },
-
-  // {
-  //   onSuccess: () => {
-  //     // Invalidate and refetch the 'products' query after a successful mutation
-  //     queryClient.invalidateQueries("products");
-  //   },
-  // }
 
   //useInfiniteQuery
   const {
     data,
     isLoading,
     isSuccess,
-    isError,
-    error,
+    // isError,
+    // error,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
@@ -118,11 +75,13 @@ const Products = () => {
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
   let productData;
+
   if (isSuccess) {
-    console.log(data);
-    productData = data?.pages[0]?.response?.data.items;
-    console.log(productData);
+    // console.log(data.pages.flatMap((prod) => prod?.response?.data?.items));
+    productData = data.pages.flatMap((prod) => prod?.response?.data?.items);
   }
+
+  // console.log(data.pages.response);
 
   // create a mutation on product
   const createProductMutation = useMutation({
@@ -228,7 +187,6 @@ const Products = () => {
       {/* render results */}
       <div className="w-2/4 mt-2">
         <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Product</TableHead>
@@ -260,19 +218,19 @@ const Products = () => {
               ))
             )}
           </TableBody>
-          {hasNextPage && (
-            <TableFooter>
-              <Button
-                onClick={() => {
-                  fetchNextPage();
-                }}
-                disabled={isFetchingNextPage}
-              >
-                {isFetchingNextPage ? "loading more..." : "load more products"}
-              </Button>
-            </TableFooter>
-          )}
         </Table>
+
+        {hasNextPage && (
+          <Button
+            onClick={() => {
+              fetchNextPage();
+            }}
+            disabled={isFetchingNextPage}
+            className="w-full text-center"
+          >
+            {isFetchingNextPage ? "loading more..." : "load more products"}
+          </Button>
+        )}
       </div>
     </section>
   );
