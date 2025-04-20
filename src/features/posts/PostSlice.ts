@@ -1,32 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  nanoid,
+  PayloadAction,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+
 import { sub } from "date-fns";
 
-const initialState = [
-  {
-    id: 1,
-    title: "Title 1",
-    content: " Content One",
-    date: sub(new Date(), { minutes: 10 }).toISOString(),
-    reactions: {
-      like: 0,
-      wow: 0,
-      cry: 0,
-    },
-  },
-
-  {
-    id: 2,
-    title: "Title 2",
-    content: " Content Two",
-    date: sub(new Date(), { minutes: 5 }).toISOString(),
-    reactions: {
-      like: 0,
-      wow: 0,
-      cry: 0,
-    },
-  },
-];
+const initialState = {
+  posts: [],
+  status: "idle",
+  error: null,
+};
 
 const postsSlice = createSlice({
   name: "posts",
@@ -44,7 +30,7 @@ const postsSlice = createSlice({
           reactions: any;
         }>
       ) {
-        state.push(action.payload);
+        state.posts.push(action.payload);
       },
       prepare(title: string, content: string, userId: any) {
         return {
@@ -68,11 +54,11 @@ const postsSlice = createSlice({
       state,
       action: PayloadAction<{
         postId: number;
-        reaction: keyof (typeof initialState)[0]["reactions"];
+        reaction: keyof (typeof initialState.posts)[0]["reactions"];
       }>
     ) {
       const { postId, reaction } = action.payload;
-      const reactedPost = state.find((post) => post.id === postId);
+      const reactedPost = state.posts.find((post) => post.id === postId);
 
       if (reactedPost) {
         reactedPost.reactions[reaction] += 1;

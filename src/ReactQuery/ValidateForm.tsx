@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CustomDateInput } from "@/components/CustomComponents/CustomDateInput";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { Trash2 } from "lucide-react";
@@ -15,6 +16,7 @@ interface formProps {
   nationality: string;
   interests: any;
   skills: any;
+  joinedDate: string;
 }
 
 const ValidateForm = () => {
@@ -29,6 +31,7 @@ const ValidateForm = () => {
       nationality: "",
       interests: [] as string[],
       skills: [] as { language: string; rating: number }[],
+      joinedDate: "",
     } as formProps,
 
     onSubmit: ({ value }) => {
@@ -294,6 +297,7 @@ const ValidateForm = () => {
         {/* skills (dynamic arrays) with obj */}
         <form.Field
           name="skills"
+          mode="array"
           // validators={{
           //   onChange: ({ value }: any) => {
           //     return value === [] ? "Username is required" : undefined;
@@ -376,6 +380,18 @@ const ValidateForm = () => {
               </div>
             </>
           )}
+        </form.Field>
+
+        {/* date input with shadCN's DatePicker */}
+        <form.Field
+          name="joinedDate"
+          validators={{
+            onChange: ({ value }) => form.setFieldValue("joinedDate", value),
+          }}
+        >
+          {(field: any) => {
+            return <CustomDateInput title="Joined Date" name={field.name} />;
+          }}
         </form.Field>
 
         {/* checkbox */}
