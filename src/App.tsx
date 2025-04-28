@@ -16,6 +16,7 @@ import ValidateForm from "./TanstackForm/ValidateForm";
 import BasicExample from "./ReactSelect/BasicExample";
 import AsynchronousSelect from "./ReactSelect/AsynchronousSelect";
 import StylingDropdown from "./ReactSelect/StylingDropdown";
+import { AccordionDemo } from "./Pages/AccoradtionDemo";
 
 function App() {
   const router = createBrowserRouter(
@@ -39,6 +40,9 @@ function App() {
           <Route path="/react-select" element={<BasicExample />} />
           <Route path="/react-select-async" element={<AsynchronousSelect />} />
           <Route path="/react-select-styling" element={<StylingDropdown />} />
+
+          {/* shadcn component tests */}
+          <Route path="/shadcn-accordion" element={<AccordionDemo />} />
         </Route>
       </>
     )

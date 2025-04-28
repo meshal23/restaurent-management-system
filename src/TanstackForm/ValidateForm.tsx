@@ -37,6 +37,8 @@ const ValidateForm = () => {
     },
   });
 
+  console.log(form.getFieldValue("skills"));
+
   return (
     <section className="w-full items-center justify-center">
       <form
