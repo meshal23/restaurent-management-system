@@ -19,15 +19,44 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
+  useQuery,
 } from "@tanstack/react-query";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import useDebounce from "../components/custom/useDebounce";
 
 const API_URL = import.meta.env.VITE_POCKETBASE_URL;
 
 const Products = () => {
   const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // use of useQuery for search
+  const {
+    data: searchProduct,
+    isLoading: isSearchProductLoading,
+    isSuccess: isSearchProductSuccess,
+    isError: isSearchProductError,
+    error: searchProductError,
+  } = useQuery({
+    queryKey: ["products", "search", debouncedSearchTerm],
+    queryFn: async () => {
+      const filter = encodeURIComponent(`name~'${debouncedSearchTerm}'`);
+      const response = await axios({
+        method: "get",
+        url: `${API_URL}products/records?filter=(${filter})`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("pocketbase_token")}`,
+        },
+      });
+
+      return response;
+    },
+    enabled: !!debouncedSearchTerm,
+  });
 
   const {
     register,
@@ -102,9 +131,20 @@ const Products = () => {
     },
   });
 
+  if (isSearchProductLoading) {
+    console.log("loading search product");
+  }
+
+  if (isSearchProductSuccess) {
+    console.log(searchProduct);
+  }
+
+  const searchProductData = searchProduct?.data.items;
+
   return (
     <section className="bg-slate-200 w-full min-h-screen flex flex-col items-center justify-center">
       <Toaster position="top-center" reverseOrder={false} />
+
       <Form className="w-2/4 bg-blue-50 p-7" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label
@@ -184,54 +224,116 @@ const Products = () => {
         </Button>
       </Form>
 
-      {/* render results */}
-      <div className="w-2/4 mt-2">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Product</TableHead>
-              <TableHead className="text-right w-[200px]">
-                {" "}
-                Description
-              </TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Availability</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <Skeleton />
-            ) : (
-              productData?.map((product: any) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell className="text-right">
-                    {product.description}
-                  </TableCell>
-                  <TableCell className="text-right">{product.price}</TableCell>
-                  <TableCell className="text-right">
-                    {product.availability
-                      ? "product currently available"
-                      : "product currently not available"}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {hasNextPage && (
-          <Button
-            onClick={() => {
-              fetchNextPage();
-            }}
-            disabled={isFetchingNextPage}
-            className="w-full text-center"
-          >
-            {isFetchingNextPage ? "loading more..." : "load more products"}
-          </Button>
-        )}
+      {/* search product */}
+      <div className="w-2/4 mt-2 flex gap-3">
+        <div className="w-4/5 mb-6">
+          <input
+            placeholder="Search Product"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            type="text"
+            id="default-input"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+        <Button onClick={() => setSearchTerm("")} className="w-1/5">
+          Find
+        </Button>
       </div>
+
+      {!searchProduct ? (
+        <div className="w-2/4 mt-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Product</TableHead>
+                <TableHead className="text-right w-[200px]">
+                  {" "}
+                  Description
+                </TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Availability</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <Skeleton />
+              ) : (
+                productData?.map((product: any) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.description}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.price}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.availability
+                        ? "product currently available"
+                        : "product currently not available"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {hasNextPage && (
+            <Button
+              onClick={() => {
+                fetchNextPage();
+              }}
+              disabled={isFetchingNextPage}
+              className="w-full text-center"
+            >
+              {isFetchingNextPage ? "loading more..." : "load more products"}
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="w-2/4 mt-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Product</TableHead>
+                <TableHead className="text-right w-[200px]">
+                  {" "}
+                  Description
+                </TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Availability</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isSearchProductLoading ? (
+                <Skeleton />
+              ) : (
+                searchProductData?.map((product: any) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.description}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.price}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.availability
+                        ? "product currently available"
+                        : "product currently not available"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </section>
   );
 };
