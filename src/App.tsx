@@ -17,6 +17,7 @@ import BasicExample from "./ReactSelect/BasicExample";
 import AsynchronousSelect from "./ReactSelect/AsynchronousSelect";
 import StylingDropdown from "./ReactSelect/StylingDropdown";
 import { AccordionDemo } from "./Pages/AccoradtionDemo";
+import AnimateDemo from "./Animation/AnimateDemo";
 
 function App() {
   const router = createBrowserRouter(
@@ -44,6 +45,7 @@ function App() {
           {/* shadcn component tests */}
           <Route path="/shadcn-accordion" element={<AccordionDemo />} />
         </Route>
+        <Route path="/animate" element={<AnimateDemo />}></Route>
       </>
     )
   );
