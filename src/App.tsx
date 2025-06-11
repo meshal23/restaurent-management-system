@@ -17,6 +17,9 @@ import BasicExample from "./ReactSelect/BasicExample";
 import AsynchronousSelect from "./ReactSelect/AsynchronousSelect";
 import StylingDropdown from "./ReactSelect/StylingDropdown";
 import { AccordionDemo } from "./Pages/AccoradtionDemo";
+import Counter from "./ZustandComponents/Counter";
+import Todo from "./ZustandComponents/Todo";
+import MoviesList from "./ZustandComponents/MoviesList";
 
 function App() {
   const router = createBrowserRouter(
@@ -43,6 +46,11 @@ function App() {
 
           {/* shadcn component tests */}
           <Route path="/shadcn-accordion" element={<AccordionDemo />} />
+
+          {/* zustand test */}
+          <Route path="/zustand-counter" element={<Counter />} />
+          <Route path="/zustand-todo" element={<Todo />} />
+          <Route path="/zustand-movie" element={<MoviesList />} />
         </Route>
       </>
     )
